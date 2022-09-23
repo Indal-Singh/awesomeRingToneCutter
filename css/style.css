@@ -1,0 +1,48 @@
+.up-row
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.up-row .up-col
+{
+    width: 50%;
+    text-align: center;
+    padding: 10px;
+    background-color: rgb(11, 83, 145);
+    color: #fff;
+    border-left: 1px solid #fff;
+    cursor: pointer;
+}
+.up-row .selected
+{
+    background: rgb(68, 150, 221);
+    box-shadow: 0px 0px 5px rgba(114, 113, 113, 0.5) inset;
+}
+
+.up-contollers
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    padding: 10px;
+    margin: 5px 0px;
+    border-radius: 5px;
+    border: 1px dotted rgb(93, 91, 91);
+}
+input[type=file],input[type=text]{
+    display: none;
+}
+label
+{
+    width: 100%;
+    background: rgb(32, 134, 218);
+    color: #fff;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 25px;
+    height: 25px;
+}
