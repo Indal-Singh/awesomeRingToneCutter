@@ -65,3 +65,41 @@ label
     border:1px solid rgb(32, 134, 218);
     color: rgb(32, 134, 218);
 }
+#cutter
+{
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    /* border-width:1px 0 1px 0;    */
+}
+.wavesurfer-region {
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+.wavesurfer-handle {
+    background: rgb(206, 6, 143);
+}
+#cutterBox
+{
+    display: none;
+}
+#contorls
+{
+display: flex;
+justify-content: center;
+align-items: center;
+margin: 10px;
+}
+
+#contorls button
+{
+    border:none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+#contorls #btnPlay
+{
+    background: rgb(36, 66, 240);
+    color: #fff;
+    padding: 10px 5px;
+    margin:0 10px;
+}

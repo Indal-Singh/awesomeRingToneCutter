@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Awesome Ringtone Maker BY Indal Singh</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <!-- wavesurfer.js regions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.2.3/wavesurfer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.2.3/plugin/wavesurfer.regions.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -28,6 +31,14 @@
                 <div id="inputURL">
                     <input type="text" class="sourceFile" placeholder="Paste Your Audio Url....." class="sourceFile">
                 </div>
+            </div>
+        </div>
+
+        <div id="cutterBox">
+            <div id="cutter">
+                <div id="waveform"></div>
+            </div>
+            <div id="contorls">
             </div>
         </div>
     </main>
