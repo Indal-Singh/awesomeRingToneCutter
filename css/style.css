@@ -31,12 +31,12 @@
     border-radius: 5px;
     border: 1px dotted rgb(93, 91, 91);
 }
-input[type=file],input[type=text]{
+input[type=file],#inputURL{
     display: none;
 }
 label
 {
-    width: 100%;
+    width: 250px;
     background: rgb(32, 134, 218);
     color: #fff;
     border-radius: 5px;
@@ -45,4 +45,23 @@ label
     text-align: center;
     line-height: 25px;
     height: 25px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+#inputURL
+{
+    width:100%;
+}
+#inputURL .sourceFile
+{
+    width:98%;
+    padding:10px;
+    margin:2px;
+    border:none;
+    outline:none;
+    border-radius:5px;
+    border:1px solid rgb(32, 134, 218);
+    color: rgb(32, 134, 218);
 }
