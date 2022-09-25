@@ -26,7 +26,7 @@
             <div class="up-contollers">
                 <div id="inputFile">
                     <input type="file" accept="audio/*" class="sourceFile" id="ringtoneFile">
-                    <label for="ringtoneFile">Select File..</label>
+                    <label for="ringtoneFile">Click Here To Select File..</label>
                 </div>
                 <div id="inputURL">
                     <input type="text" class="sourceFile" placeholder="Paste Your Audio Url....." class="sourceFile">
@@ -38,8 +38,10 @@
             <div id="cutter">
                 <div id="waveform"></div>
             </div>
-            <div id="contorls">
-            </div>
+            <form id="form" method="POST" action="app/download.php">
+                <div id="contorls">
+                </div>
+            </form>
         </div>
     </main>
 

@@ -58,25 +58,29 @@ const createWaveForms = () =>  // function for creating waveforms
     // resize:true,
     // drag:true,
     cursorWidth: 1,
-    height: 100,
-    minLength: 0,
-    maxLength: 168
-    
+    height: 100
 });
 
 wavesurfer.on('ready', function() {
     let playPasue = document.createElement("button");
     let preview = document.createElement("button");
+    let downloadBtn = document.createElement("button");
     playPasue.innerText="Play";
-    preview.innerText="Preview";
     playPasue.setAttribute('onclick','togglePlay()');
-    preview.setAttribute('onclick','previewTone(this)');
+    playPasue.setAttribute('type','button');
     playPasue.setAttribute('id','btnPlay'); 
-    preview.setAttribute('id','btnPreview'); 
+    preview.innerText="Preview";
+    preview.setAttribute('type','button');
+    preview.setAttribute('onclick','previewTone(this)');
+    preview.setAttribute('id','btnPreview');
+    downloadBtn.innerText="Download";
+    downloadBtn.setAttribute('type','submit');
+    downloadBtn.setAttribute('id','btnDownload'); 
     wavesurfer.enableDragSelection({}); // for enable selection area
     $('#contorls').html('');
     $('#contorls').append(playPasue);
     $('#contorls').append(preview);
+    $('#contorls').append(downloadBtn);
 });
 
 wavesurfer.on('region-updated', function(region) { // this is for selection only one area
@@ -89,13 +93,35 @@ wavesurfer.on('region-updated', function(region) { // this is for selection only
 
 wavesurfer.on('region-created', function(newRegion) {
 // console.log(newRegion.id);
-$('#btnPreview').attr('data-id',newRegion.id) // seting selected area id
+$('#btnPreview').attr('data-id',newRegion.id) // seting selected area id   
 });
 wavesurfer.on('region-update-end', function(newRegion) {
-    // console.log(wavesurfer.regions.list);
+    console.log(newRegion.start);
+    $('#form input').remove();
+    let inputStart = document.createElement("input");
+    let inputEnd = document.createElement("input");
+    inputStart.setAttribute('hidden','hidden');
+    inputStart.setAttribute('name','start');
+    inputStart.setAttribute('value',Math.round(newRegion.start));
+    inputEnd.setAttribute('hidden','hidden');
+    inputEnd.setAttribute('name','end');
+    inputEnd.setAttribute('value',Math.round(newRegion.end));
+    $('#form').append(inputStart);
+    $('#form').append(inputEnd);
+    $('#btnDownload').show(); 
+    setInputName(); // call function for setting input file name
 });
 }
 
+const setInputName = () => // function for setting name in form type input box
+{
+    let fileName = $('#ringtoneFile').prop('files')[0].name;
+    let inputFileName = document.createElement("input");
+    inputFileName.setAttribute('hidden','hidden');
+    inputFileName.setAttribute('name','fileName');
+    inputFileName.setAttribute('value',fileName);
+    $('#form').append(inputFileName);
+}
 const loadFile = (e) => // loading file
 {
     if(e.target.files)
@@ -106,6 +132,7 @@ const loadFile = (e) => // loading file
         // console.log(e.target.files);
         createWaveForms();
         wavesurfer.load(URL.createObjectURL(fileInput));
+        
     }
 
     
