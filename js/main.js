@@ -36,6 +36,14 @@ const togglePlay = () => // functioin for play pause
     }
 }
 
+const previewTone = (e) => // preview Selected Area
+{
+    let selectedId = e.getAttribute('data-id'); // selected id
+    wavesurfer.regions.list[selectedId].play();
+    $('#btnPlay').html('Pause');
+    isplaying = true;
+    // console.log(selectedId);
+}
 
 const createWaveForms = () =>  // function for creating waveforms
 {
@@ -53,16 +61,22 @@ const createWaveForms = () =>  // function for creating waveforms
     height: 100,
     minLength: 0,
     maxLength: 168
+    
 });
 
 wavesurfer.on('ready', function() {
     let playPasue = document.createElement("button");
+    let preview = document.createElement("button");
     playPasue.innerText="Play";
+    preview.innerText="Preview";
     playPasue.setAttribute('onclick','togglePlay()');
+    preview.setAttribute('onclick','previewTone(this)');
     playPasue.setAttribute('id','btnPlay'); 
+    preview.setAttribute('id','btnPreview'); 
     wavesurfer.enableDragSelection({}); // for enable selection area
     $('#contorls').html('');
     $('#contorls').append(playPasue);
+    $('#contorls').append(preview);
 });
 
 wavesurfer.on('region-updated', function(region) { // this is for selection only one area
@@ -74,10 +88,11 @@ wavesurfer.on('region-updated', function(region) { // this is for selection only
 });
 
 wavesurfer.on('region-created', function(newRegion) {
-
+// console.log(newRegion.id);
+$('#btnPreview').attr('data-id',newRegion.id) // seting selected area id
 });
 wavesurfer.on('region-update-end', function(newRegion) {
-    console.log(wavesurfer.regions.list);
+    // console.log(wavesurfer.regions.list);
 });
 }
 
