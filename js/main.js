@@ -62,6 +62,8 @@ const createWaveForms = () =>  // function for creating waveforms
 });
 
 wavesurfer.on('ready', function() {
+    readAndDecodeAudio();
+    totalAudioDuration = wavesurfer.getDuration();
     let playPasue = document.createElement("button");
     let preview = document.createElement("button");
     let downloadBtn = document.createElement("button");
@@ -74,7 +76,7 @@ wavesurfer.on('ready', function() {
     preview.setAttribute('onclick','previewTone(this)');
     preview.setAttribute('id','btnPreview');
     downloadBtn.innerText="Download";
-    downloadBtn.setAttribute('type','submit');
+    downloadBtn.setAttribute('type','button');
     downloadBtn.setAttribute('id','btnDownload'); 
     wavesurfer.enableDragSelection({}); // for enable selection area
     $('#contorls').html('');
@@ -96,7 +98,6 @@ wavesurfer.on('region-created', function(newRegion) {
 $('#btnPreview').attr('data-id',newRegion.id) // seting selected area id   
 });
 wavesurfer.on('region-update-end', function(newRegion) {
-    console.log(newRegion.start);
     $('#form input').remove();
     let inputStart = document.createElement("input");
     let inputEnd = document.createElement("input");
@@ -109,6 +110,7 @@ wavesurfer.on('region-update-end', function(newRegion) {
     $('#form').append(inputStart);
     $('#form').append(inputEnd);
     $('#btnDownload').show(); 
+    $('#btnDownload').attr('onclick',`downloadTrack('${newRegion.id}')`);
     setInputName(); // call function for setting input file name
 });
 }
@@ -133,10 +135,123 @@ const loadFile = (e) => // loading file
         createWaveForms();
         wavesurfer.load(URL.createObjectURL(fileInput));
         
-    }
-
-    
+    }   
 }
+function downloadTrack(regionId) {
+	trimAudio(wavesurfer.regions.list[regionId]);
+}
+const readAudio = () => {	
+    file = $('#ringtoneFile').prop('files')[0]; // geting audio file
+	return new Promise((resolve, reject) => {
+					let reader = new FileReader();
+					reader.readAsArrayBuffer(file);
+
+					//Resolve if audio gets loaded
+					reader.onload = function() {
+						console.log("Audio Loaded");
+						resolve(reader);
+					}
+					reader.onerror = function(error){
+						console.log("Error while reading audio");
+						reject(error);
+					}
+
+					reader.onabort = function(abort){
+						console.log("Aborted");
+						console.log(abort);
+						reject(abort);
+					}
+
+				})
+}
+
+async function readAndDecodeAudio() {
+	let arrBuffer = null;
+
+	//Read the original Audio
+	await readAudio()
+			.then((results) => {
+				arrBuffer = results.result;
+			})
+			.catch((error) => {
+				window.alert("Some Error occured");
+				return;
+			}); 
+
+	//Decode the original Audio into audioBuffer
+	await new AudioContext().decodeAudioData(arrBuffer)
+				.then((res) => {
+					window['audioBuffer'] = res;
+				})
+				.catch((err) => {
+					window.alert("Can't decode Audio");
+					return;
+				});
+}
+
+const encodeAudioBufferLame = (audioData) =>
+{
+    return new Promise( (resolve, reject) => {
+        let worker = new Worker('./js/worker.js');
+        
+        worker.onmessage = (event) => {
+            if(event.data != null){
+                resolve(event.data);
+            }
+            else{
+                reject("Error");
+            }
+            let blob = new Blob(event.data.res, {type: 'audio/mp3'});
+              processedAudio = new window.Audio();
+              processedAudio.src = URL.createObjectURL(blob);
+            //   console.log(blob);
+        };
+
+        worker.postMessage({'audioData': audioData});
+    });		
+}
+async function trimAudio(region) {
+	//Create empty buffer and then put the slice of audioBuffer i.e wanted part
+	let startPoint = Math.floor((region.start*audioBuffer.length)/totalAudioDuration);
+	let endPoint = Math.ceil((region.end*audioBuffer.length)/totalAudioDuration);
+	let audioLength = endPoint - startPoint;
+
+	let trimmedAudio = new AudioContext().createBuffer(
+		audioBuffer.numberOfChannels,
+		audioLength,
+		audioBuffer.sampleRate
+	);
+
+	for(i=0;i<audioBuffer.numberOfChannels;i++){
+		trimmedAudio.copyToChannel(audioBuffer.getChannelData(i).slice(startPoint,endPoint),i);
+	}
+
+	let audioData = {
+		channels: Array.apply(null,{length: trimmedAudio.numberOfChannels})
+					.map(function(currentElement, index) {
+						return trimmedAudio.getChannelData(index);
+					}),
+		sampleRate: trimmedAudio.sampleRate,
+    	length: trimmedAudio.length,
+	}
+	await encodeAudioBufferLame(audioData)
+		.then((res) => {
+			downloadAudio();
+		})
+		.catch((c) => {
+			console.log(c);
+		});
+}
+
+
+const downloadAudio = () => {
+	let anchorAudio = document.createElement("a");
+    anchorAudio.href = processedAudio.src;
+	anchorAudio.download = `${$('#ringtoneFile').prop('files')[0].name.replace(".mp3", "")}-Ringtone.mp3`;
+	anchorAudio.click();
+}
+
+
 $('.up-col').on('click',selectType); // calling on click
 $('.sourceFile').on('change',loadFile); // calling on click
 $('.sourceFile').on('paste',loadFile); // calling on paste
