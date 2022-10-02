@@ -1,4 +1,4 @@
-create some folders
+create some folders to work properlly this small app
 
 files (in root of project)
 files/convertedFiles
