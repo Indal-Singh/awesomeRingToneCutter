@@ -148,6 +148,7 @@ const loadFile = (e) => // loading file
     }
     else if((e.target.value && e.target.id=='sourceFile'))
     {
+        $('#loader').show();
         $('#ringtoneFile').val('');
         let audioUrl = e.target.value;
         $.ajax({
@@ -181,6 +182,8 @@ const loadFile = (e) => // loading file
                     .catch((e) => {
                         console.error('error', e);
                     });
+
+                    $('#loader').hide();
                 }
              }
         })
