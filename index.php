@@ -29,7 +29,7 @@
                     <label for="ringtoneFile">Click Here To Select File..</label>
                 </div>
                 <div id="inputURL">
-                    <input type="text" class="sourceFile" placeholder="Paste Your Audio Url....." class="sourceFile">
+                    <input type="text" class="sourceFile" placeholder="Paste Your Audio Url....." id="sourceFile">
                 </div>
             </div>
         </div>
@@ -44,7 +44,6 @@
             </form>
         </div>
     </main>
-
     <script src="js/main.js"></script>
 </body>
 

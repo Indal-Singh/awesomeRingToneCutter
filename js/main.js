@@ -62,6 +62,7 @@ const createWaveForms = () =>  // function for creating waveforms
 });
 
 wavesurfer.on('ready', function() {
+    if($('#ringtoneFile').prop('files')[0])
     readAndDecodeAudio();
     totalAudioDuration = wavesurfer.getDuration();
     let playPasue = document.createElement("button");
@@ -76,7 +77,7 @@ wavesurfer.on('ready', function() {
     preview.setAttribute('onclick','previewTone(this)');
     preview.setAttribute('id','btnPreview');
     downloadBtn.innerText="Download";
-    downloadBtn.setAttribute('type','button');
+    ($('#ringtoneFile').prop('files')[0])?(downloadBtn.setAttribute('type','button')): (downloadBtn.setAttribute('type','submit')); // using teranry oprator
     downloadBtn.setAttribute('id','btnDownload'); 
     wavesurfer.enableDragSelection({}); // for enable selection area
     $('#contorls').html('');
@@ -84,6 +85,11 @@ wavesurfer.on('ready', function() {
     $('#contorls').append(preview);
     $('#contorls').append(downloadBtn);
 });
+wavesurfer.on('finish', function() {
+    // console.log('indal');
+    $('#btnPlay').html('Play');
+    isplaying = false;
+})
 
 wavesurfer.on('region-updated', function(region) { // this is for selection only one area
     let regions = region.wavesurfer.regions.list;
@@ -110,14 +116,17 @@ wavesurfer.on('region-update-end', function(newRegion) {
     $('#form').append(inputStart);
     $('#form').append(inputEnd);
     $('#btnDownload').show(); 
+    if($('#ringtoneFile').prop('files')[0])
     $('#btnDownload').attr('onclick',`downloadTrack('${newRegion.id}')`);
+    if($('#sourceFile').val()!=null)
     setInputName(); // call function for setting input file name
 });
 }
 
 const setInputName = () => // function for setting name in form type input box
 {
-    let fileName = $('#ringtoneFile').prop('files')[0].name;
+    let url = $('#sourceFile').val();
+    let fileName = url.substring(url.lastIndexOf('/')+1);
     let inputFileName = document.createElement("input");
     inputFileName.setAttribute('hidden','hidden');
     inputFileName.setAttribute('name','fileName');
@@ -126,8 +135,9 @@ const setInputName = () => // function for setting name in form type input box
 }
 const loadFile = (e) => // loading file
 {
-    if(e.target.files)
+    if(e.target.files && e.target.id=='ringtoneFile')
     {
+        $('#sourceFile').val('');
         let fileInput = e.target.files[0];
         $('label').html(fileInput.name);
         $('#cutterBox').show();
@@ -135,9 +145,49 @@ const loadFile = (e) => // loading file
         createWaveForms();
         wavesurfer.load(URL.createObjectURL(fileInput));
         
-    }   
+    }
+    else if((e.target.value && e.target.id=='sourceFile'))
+    {
+        $('#ringtoneFile').val('');
+        let audioUrl = e.target.value;
+        $.ajax({
+            url:'app/createJsonFile.php',
+            type:'POST',
+            data:{fileUrl:audioUrl},
+            success:function(result)
+            {
+                // console.log(result);
+                if(result!="")
+                {
+                    createWaveForms();
+                    $('#cutterBox').show();
+                    $('#cutterBox').append(`<audio src="" id="audio"></audio>`);
+                    let mediaElt = document.querySelector('audio');
+                    mediaElt.src=`files/convertedFiles/${result}.mp3`;
+                    fetch(`files/jsonfiles/${result}.json`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("HTTP error " + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(peaks => {
+                        // console.log(peaks);
+                        // console.log('loaded peaks! sample_rate: ' + peaks.sample_rate);
+
+                        // load peaks into wavesurfer.js
+                        wavesurfer.load(mediaElt,peaks.data);
+                    })
+                    .catch((e) => {
+                        console.error('error', e);
+                    });
+                }
+             }
+        })
+    } 
 }
 function downloadTrack(regionId) {
+    $('#btnDownload').text('Please Wait...');
 	trimAudio(wavesurfer.regions.list[regionId]);
 }
 const readAudio = () => {	
@@ -249,12 +299,13 @@ const downloadAudio = () => {
     anchorAudio.href = processedAudio.src;
 	anchorAudio.download = `${$('#ringtoneFile').prop('files')[0].name.replace(".mp3", "")}-Ringtone.mp3`;
 	anchorAudio.click();
+    $('#btnDownload').text('Download');
 }
 
 
 $('.up-col').on('click',selectType); // calling on click
 $('.sourceFile').on('change',loadFile); // calling on click
-$('.sourceFile').on('paste',loadFile); // calling on paste
+// $('.sourceFile').on('paste',loadFile); // calling on paste
 
 
 
