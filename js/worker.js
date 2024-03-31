@@ -26,7 +26,7 @@
 		if(audioData.channels.length == 1) {
 			mp3Encoder = new lamejs.Mp3Encoder(1, audioData.sampleRate, 128);
 			return new Promise( (resolve, reject) => {
-				console.log(evt);
+				// console.log(evt);
 
 				var arrayBuffer = audioData.channels[0];
 				var sampleRate = audioData.sampleRate;
